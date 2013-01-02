@@ -86,6 +86,7 @@ $(document).ready(function(){
           activeActor.data("yPos", -1);
           activeActor.data("name", name);
           activeActor.data("stance", stance);
+          $("#" + messageBody.id + "_" + activeActor.data("stance")).addClass("lit");
         }
       } else {
         // command to move it on the map.
@@ -106,6 +107,7 @@ $(document).ready(function(){
       activeActor.data("yPos", messageBody.yPos);
       activeActor.data("name", messageBody.name);
       activeActor.data("stance", stance);
+      $("#" + messageBody.id + "_" + activeActor.data("stance")).addClass("lit");
       activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
       activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
     } else {
