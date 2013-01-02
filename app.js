@@ -39,7 +39,7 @@ io.sockets.on("connection", function (socket) {
     console.log(data.message);
   });
   socket.on("initialState", function (data) {
-    // client has requested initial update, respond with an "actors" message.
+    //client has requested initial update, respond with an "actors" message.
     getCurrentActorState(socket);
   });
   socket.on("newActor", function (messageBody) {
@@ -62,27 +62,30 @@ io.sockets.on("connection", function (socket) {
     check(messageBody.id).isInt();
     moveActor(messageBody.id, messageBody.name, messageBody.xPos, messageBody.yPos, socket);
   });
+  socket.on("changeStance", function (messageBody) {
+    // update repository with new stance for character
+    check(messageBody.id).isInt();
+    check(messageBody.stance).isInt();
+    updateStance(messageBody.id, messageBody.stance, socket);
+  });
 });
 
 function addActor(name, socket) {
   if (name) {
     var db = new sqlite3.Database("public/vboard.db");
-    db.run("INSERT INTO actors ('name', 'xPos', 'yPos') VALUES (?, -1, -1)", [name], function(err) {
+    db.run("INSERT INTO actors ('name', 'stance', 'xPos', 'yPos') VALUES (?, 0, -1, -1)", [name], function(err) {
       if (err) {
         socket.emit("error", JSON.stringify({ message: "Failed to determine the identity of the new actor. Query returned error." + err }));
         return;
       }
       if (this.lastID) {
-        var addedData = {id: this.lastID, name: name, xPos: -1, yPos: -1};
+        var addedData = {id: this.lastID, name: name, stance: 0, xPos: -1, yPos: -1};
         io.sockets.emit("actorAdded", JSON.stringify(addedData));
       } else {
         socket.emit("error", JSON.stringify({ message: "Failed to add new actor. Likely a store issue or id collision." }));
       }
     });
     db.close();
-
-    //db.get("SELECT id FROM actors WHERE name = '" + name + "';", function(err, result) {
-    //});
   } else {
     socket.emit("error", JSON.stringify({ message: "Failed to add new actor. No name provided." }));
   }
@@ -146,7 +149,7 @@ function getCurrentActorState(socket) {
   var db = new sqlite3.Database("public/vboard.db", "OPEN_READWRITE", function (error) {
     console.log(error);
   });
-  db.all("SELECT id, name, xPos, yPos FROM actors;", [], function(err, results) {
+  db.all("SELECT id, name, stance, xPos, yPos FROM actors;", [], function(err, results) {
       if (err) {
         console.log("Error occurred during select.");
         socket.emit("error", JSON.stringify({ message: "Failed to retrieve actors. Query returned error." + err }));
@@ -155,7 +158,7 @@ function getCurrentActorState(socket) {
       if (results) {
         var actorData = [];
         for (var i = 0; i < results.length; i++) {
-          actorData.push({ id: results[i].id, name: results[i].name, xPos: results[i].xPos, yPos: results[i].yPos });
+          actorData.push({ id: results[i].id, name: results[i].name, stance: results[i].stance, xPos: results[i].xPos, yPos: results[i].yPos });
         }
         socket.emit("actors", JSON.stringify(actorData));
       } else {
@@ -163,6 +166,32 @@ function getCurrentActorState(socket) {
       }
     });
   db.close();
+}
+
+function updateStance(id, stance, socket) {
+  if (id) {
+    if (!isNumber(stance) || (stance < 0 || stance > 3)) {
+      stance = 1;
+    }
+    var db = new sqlite3.Database("public/vboard.db");
+    db.run("UPDATE actors SET stance = $stance WHERE id = $id",
+      { $stance:stance, $id:id }, 
+      function(err) {
+        if (err) {
+          socket.emit("error", JSON.stringify({ message: "Failed to update the stance information for this actor." + err }));
+          return;
+        }
+        if (this.changes == 1) {
+          var changedData = {id: id, stance: stance};
+          io.sockets.emit("stanceChanged", JSON.stringify(changedData));
+        } else {
+          socket.emit("error", JSON.stringify({ message: "Failed to update the single actor to their new stance." }));
+        }
+      });
+    db.close();
+  } else {
+    socket.emit("error", JSON.stringify({ message: "Failed to change stance of actor, either no id or name provided." }));
+  }
 }
 
 function isNumber(n) {

@@ -21,10 +21,10 @@ $(document).ready(function(){
     for (var i = 0; i < messageArray.length; i++) {
       if (messageArray[i].xPos == -1 || messageArray[i].yPos == -1) {
         //this one is in the toolbox. No positioning.
-        var newActor = "<div id='" + messageArray[i].id + "' class='actor inToolBox'>" + messageArray[i].name + "</div>";
+        var newActor = "<div id='" + messageArray[i].id + "' class='actor inToolBox'><div class='dragHandle'>" + messageArray[i].name + "</div><div class='stanceControl forward' id='" + messageArray[i].id + "_0'>F</div><div class='stanceControl balanced' id='" + messageArray[i].id + "_1'>B</div><div class='stanceControl defensive' id='" + messageArray[i].id + "_2'>D</div><div class='stanceControl ranged' id='" + messageArray[i].id + "_3'>R</div></div>";
         $("#actors").append(newActor);
       } else {
-        var newActor = "<div id='" + messageArray[i].id + "' class='actor onMap'>" + messageArray[i].name + "</div>";
+        var newActor = "<div id='" + messageArray[i].id + "' class='actor onMap'><div class='dragHandle'>" + messageArray[i].name + "</div><div class='stanceControl forward' id='" + messageArray[i].id + "_0'>F</div><div class='stanceControl balanced' id='" + messageArray[i].id + "_1'>B</div><div class='stanceControl defensive' id='" + messageArray[i].id + "_2'>D</div><div class='stanceControl ranged' id='" + messageArray[i].id + "_3'>R</div></div>";
         $("#map").append(newActor);
         var posSet = $("#" + messageArray[i].id);
         posSet.css({top: messageArray[i].yPos, left: messageArray[i].xPos});
@@ -32,21 +32,27 @@ $(document).ready(function(){
       $("#" + messageArray[i].id).data("xPos", messageArray[i].xPos);
       $("#" + messageArray[i].id).data("yPos", messageArray[i].yPos);
       $("#" + messageArray[i].id).data("name", messageArray[i].name);
-      $("#" + messageArray[i].id).draggable({ grid: [50, 50], revert: "invalid", snap: true });
+      $("#" + messageArray[i].id).data("stance", messageArray[i].stance);
+      $("#" + messageArray[i].id).draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
+      $("#" + messageArray[i].id + "_" + messageArray[i].stance).addClass("lit");
+      $("#" + messageArray[i].id).children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
     }
   });
   socket.on("actorAdded", function (data) {
     var messageBody = JSON.parse(data);
     updateLog("Adding actor " + messageBody.name);
     //Add new actor to the toolbox, then add message to the log.
-    var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'>" + messageBody.name + "</div>";
+    var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
     $("#actors").append(newActor);
     $("#" + messageBody.id).data("xPos", messageBody.xPos);
     $("#" + messageBody.id).data("yPos", messageBody.yPos);
     $("#" + messageBody.id).data("name", messageBody.name);
-    $("#" + messageBody.id).draggable({ grid: [50, 50], revert: "invalid", snap: true });
+    $("#" + messageBody.id).data("stance", messageBody.stance);
+    $("#" + messageBody.id).draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl"  });
+    $("#" + messageBody.id + "_" + messageBody.stance).addClass("lit");
+    $("#" + messageBody.id).children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
   });
-  socket.on('actorDeleted', function (data) {
+  socket.on("actorDeleted", function (data) {
     var messageBody = JSON.parse(data);
     updateLog("Deleting actor " + messageBody.name);
     //locate the actor involved and delete it, then add a message to the log.
@@ -54,7 +60,7 @@ $(document).ready(function(){
       $("#" + messageBody.id).remove; 
     });
   });
-  socket.on('actorMoved', function (data) {
+  socket.on("actorMoved", function (data) {
     //locate the actor involved and update it, then add a message to the log.
     var messageBody = JSON.parse(data);
     updateLog("Updating actor " + messageBody.name);
@@ -62,6 +68,9 @@ $(document).ready(function(){
     var activeActor = $("#" + messageBody.id);
     if (activeActor)
     {
+      var stance = activeActor.data("stance");
+      var name = activeActor.data("name");
+
       if (messageBody.xPos == -1 || messageBody.yPos == -1) {
         // command to move it into the toolbox.
         if (activeActor.data("xPos") == -1 || activeActor.data("yPos") == -1) {
@@ -69,16 +78,21 @@ $(document).ready(function(){
         } else {
           // it is presently on the map, must remove it and add it to the toolbox
           activeActor.remove();
-          var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'>" + messageBody.name + "</div>";
+          var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
           $("#actors").append(newActor);
           activeActor = $("#" + messageBody.id);
+          activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
+          activeActor.data("xPos", -1);
+          activeActor.data("yPos", -1);
+          activeActor.data("name", name);
+          activeActor.data("stance", stance);
         }
       } else {
         // command to move it on the map.
         if (activeActor.data("xPos") == -1 || activeActor.data("yPos") == -1) {
           // it is presently in the toolbox. Must remove it and add it to the map.
           activeActor.remove();
-          var newActor = "<div id='" + messageBody.id + "' class='actor onMap'>" + messageBody.name + "</div>";
+          var newActor = "<div id='" + messageBody.id + "' class='actor onMap'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
           $("#map").append(newActor);
           activeActor = $("#" + messageBody.id);
         } else {
@@ -91,13 +105,23 @@ $(document).ready(function(){
       activeActor.data("xPos", messageBody.xPos);
       activeActor.data("yPos", messageBody.yPos);
       activeActor.data("name", messageBody.name);
-      activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true });
+      activeActor.data("stance", stance);
+      activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
+      activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
     } else {
       // Could not find the actor being moved, raise error.
       updateLog("Error: Could not find the actor being moved: " + messageBody.name, 1);
     }
   });
-
+  socket.on("stanceChanged", function (data) {
+    var messageBody = JSON.parse(data);
+    var activeActor = $("#" + messageBody.id);
+    updateLog("Actor " + activeActor.data("name") + " changed stance from " + activeActor.data("stance") + " to " + messageBody.stance);
+    $("#" + messageBody.id + "_" + activeActor.data("stance")).removeClass("lit");
+    $("#" + messageBody.id + "_" + messageBody.stance).addClass("lit");
+    activeActor.data("stance", messageBody.stance);
+  });
+  
   stretchScreen()
 
   $("#map").droppable( { greedy: true, accept: ".actor", tolerance: "fit" } );
@@ -134,6 +158,14 @@ $(document).ready(function(){
   updateLog("Requesting initial state.");
   socket.emit("initialState", { });
 });
+
+function stanceChangeHandler(event) {
+    var ident = this.id.split("_");
+    var actorid = ident[0];
+    var stanceid = ident[1];
+    var socket = event.data.dispatch;
+    socket.emit("changeStance", { id:actorid, stance:stanceid } );
+}
 
 function updateLog(message, type) {
   type = type || 0;
@@ -196,7 +228,6 @@ function updateLog(message, type) {
         //$.mobile.silentScroll(0);
       }
     }
+
   } 
-
 //end copy
-

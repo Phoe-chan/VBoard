@@ -91,11 +91,31 @@ a {
   overflow-y: hidden;
 }
 .actor {
+  position: relative;
   border: 1px solid #000;
   height: 50px;
   width: 50px;
   z-Index: 100;
   overflow: hidden;
+}
+.forward {
+  color: #f00;
+}
+.balanced {
+  color: #f90;
+}
+.defensive {
+  color: #008000;
+}
+.ranged {
+  color: #90f;
+}
+.stanceControl {
+  background-color: #000;
+  float: left;
+}
+.lit {
+  background-color: #fff;
 }
 .onMap {
   position: absolute;
