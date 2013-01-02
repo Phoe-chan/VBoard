@@ -1,0 +1,104 @@
+body {
+  padding: 5px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00b7ff;
+}
+.topBar {
+  width: 100%;
+  height: 100px;
+}
+.logWindow {
+  padding: 5px;
+  border: 1px solid #000;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background: #eeff82;
+  width: 80%;
+  float: left;
+}
+.timestamp {
+  font-size: 10px;
+  float: left;
+  color: #060606;
+}
+.log,
+.logMsg,
+.logError {
+  font-size: 12;
+}
+.logMsg {
+  color: #000;
+}
+.logError {
+  color: #f00;
+}
+.trash {
+  border: 1px solid #000;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background: #ebb;
+  color: #a9a9a9;
+  width: 14%;
+  float: left;
+  padding-left: 20px;
+  padding-top: 37px;
+  padding-bottom: 38px;
+  z-Index: 1;
+}
+.main {
+  padding: 10px;
+  height: 800px;
+}
+.toolBox {
+  width: 16%;
+  min-height: 100%;
+  float: left;
+}
+.addActor {
+  width: 100%;
+  height: 20px;
+}
+.addButton {
+  width: 20px;
+  height: 20px;
+}
+.addInput {
+  width: 120px;
+  float: left;
+}
+.actors {
+  width: 100%;
+  min-height: 200px;
+  border: 1px solid;
+  z-Index: 1;
+}
+.map {
+  width: 80%;
+  min-height: 100%;
+  position: relative;
+  float: left;
+  z-Index: 1;
+  background-image: url("/images/trollpool.gif");
+  background-repeat: no-repeat;
+}
+.noscroll {
+  overflow: hidden;
+  overflow-y: hidden;
+}
+.actor {
+  border: 1px solid #000;
+  height: 50px;
+  width: 50px;
+  z-Index: 100;
+  overflow: hidden;
+}
+.onMap {
+  position: absolute;
+}
+.inToolBox {
+  position: static;
+}

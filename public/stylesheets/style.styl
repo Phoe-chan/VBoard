@@ -1,0 +1,103 @@
+body
+  padding: 5px
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+a
+  color: #00B7FF
+
+ border-radius()
+   -webkit-border-radius arguments
+   -moz-border-radius arguments
+   border-radius arguments
+
+.topBar
+  width: 100%
+  height: 100px
+
+.logWindow
+  padding: 5px
+  border: 1px solid black
+  border-radius: 5px
+  background: #EEFF82
+  width: 80%
+  float: left
+
+.timestamp
+  font-size: 10px
+  float: left
+  color: #060606
+
+.log
+  font-size: 12
+
+.logMsg
+  @extend .log;
+  color: #000000
+
+.logError
+  @extend .log;
+  color: #FF0000
+
+.trash
+  border: 1px solid black
+  border-radius: 5px
+  background: #EEBBBB
+  color: #A9A9A9
+  width: 14%
+  float: left
+  padding-left: 20px
+  padding-top: 37px
+  padding-bottom: 38px
+  z-Index: 1
+
+.main
+  padding: 10px
+  height: 800px
+
+.toolBox
+  width: 16%
+  min-height: 100%
+  float: left
+
+.addActor
+  width: 100%
+  height: 20px
+
+.addButton
+  width: 20px
+  height: 20px
+
+.addInput
+  width: 120px
+  float: left
+
+.actors
+  width: 100%
+  min-height: 200px
+  border: 1px solid
+  z-Index: 1
+
+.map
+  width: 80%
+  min-height: 100%
+  position: relative
+  float: left
+  z-Index: 1
+  background-image: url(/images/trollpool.gif)
+  background-repeat: no-repeat; 
+
+.noscroll
+  overflow: hidden
+  overflow-y: hidden
+
+.actor
+  border 1px solid black
+  height: 50px
+  width: 50px
+  z-Index: 100
+  overflow: hidden
+
+.onMap
+  position: absolute
+
+.inToolBox
+  position: static
