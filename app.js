@@ -1,6 +1,5 @@
 var express = require("express")
   , routes = require("./routes")
-  , user = require("./routes/user")
   , http = require("http")
   , path = require("path")
   , sio = require("socket.io")
@@ -28,7 +27,6 @@ app.configure("development", function(){
 });
 
 app.get("/", routes.index);
-//app.get("/users", user.list);
 
 var namedActors = [];
 var server = http.createServer(app).listen(app.get("port"), function(){

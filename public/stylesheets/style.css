@@ -84,6 +84,7 @@ a {
   z-Index: 1;
   background-image: url("/images/trollpool.gif");
   background-repeat: no-repeat;
+  left: 10px;
 }
 .noscroll {
   overflow: hidden;
