@@ -10,4 +10,6 @@ Just run node app.js and then connect multiple webbrowsers to port 3000. You can
 
 The board implements no gamelogic as it is to support our Play By Skype sessions of tabletop roleplaying games, it is simply a visualisation tool to help in the more tactically based games we play.
 
-Development branch implementing some game logic in the form of Stances. An actor can be in one of four stances Forward, Balanced, Defensive or Ranged. These are now displayed on the actor and clickable to change stances. Actors cannot be dragged using the stance bar, they must be dragged elsewhere on the div.
+Updates
+=======
+v1.1 - Added stance functionality. Actors can now be in one of four stances, Forward, Balanced, Defensive and Ranged, the stance can be changed by clicking on the desired stance in the stance bar on each actor. The currently selected stance is backlit in white.
