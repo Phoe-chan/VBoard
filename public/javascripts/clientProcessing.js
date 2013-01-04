@@ -81,12 +81,13 @@ $(document).ready(function(){
           var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
           $("#actors").append(newActor);
           activeActor = $("#" + messageBody.id);
-          activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
           activeActor.data("xPos", -1);
           activeActor.data("yPos", -1);
           activeActor.data("name", name);
           activeActor.data("stance", stance);
           $("#" + messageBody.id + "_" + activeActor.data("stance")).addClass("lit");
+          activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
+          activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
         }
       } else {
         // command to move it on the map.
@@ -96,6 +97,9 @@ $(document).ready(function(){
           var newActor = "<div id='" + messageBody.id + "' class='actor onMap'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
           $("#map").append(newActor);
           activeActor = $("#" + messageBody.id);
+          activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
+          activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
+          $("#" + messageBody.id + "_" + stance).addClass("lit");
         } else {
           // it is presently on the map, we must move it.
           activeActor = $("#" + messageBody.id);
@@ -107,9 +111,6 @@ $(document).ready(function(){
       activeActor.data("yPos", messageBody.yPos);
       activeActor.data("name", messageBody.name);
       activeActor.data("stance", stance);
-      $("#" + messageBody.id + "_" + activeActor.data("stance")).addClass("lit");
-      activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
-      activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
     } else {
       // Could not find the actor being moved, raise error.
       updateLog("Error: Could not find the actor being moved: " + messageBody.name, 1);
