@@ -27,6 +27,8 @@ app.configure("development", function(){
 });
 
 app.get("/", routes.index);
+app.get("/board/:boardId", routes.board);
+app.get("/boards/", routes.boardlist);
 
 var namedActors = [];
 var server = http.createServer(app).listen(app.get("port"), function(){

@@ -7,25 +7,15 @@
   </head>
   <body data-role='page'>
     <div class='topBar' data-role='header'>
-      <div id='log' class='logWindow'>
+      <div id='title' class='titleBar'>
+        Virtual Board
       </div>
-      <div id='trash' class='trash'>Destroy</div>
     </div>
     <div id='main' data-role='content'>
-      <div id='toolBox' class='toolBox'>
-        <div id='addActor' class='addActor'>
-          <input id='actorName' type='text' class='addInput'/><div id='addButton' class='addButton ui-icon ui-icon-plusthick'></div>
-        </div>
-        <hr>
-        <div id='actors' class='actors'></div>
-      </div>
-      <div id='map' class='map'>
-      </div>
+      The mainpage, pick out a board to interact with.
     </div>  
     <script type='text/javascript' src='/javascripts/jquery-1.8.2.min.js'></script>
     <script type='text/javascript' src='/javascripts/jquery-ui-1.8.24.custom.min.js'></script>
-    <script type='text/javascript' src='/javascripts/jquery.watermark.min.js'></script>
-    <script src='/socket.io/socket.io.js'></script>
-    <script type='text/javascript' src='/javascripts/clientProcessing.js'></script>
+    <script type='text/javascript' src='/javascripts/indexProcessing.js'></script>
   </body>
 </html>
