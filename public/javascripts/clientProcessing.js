@@ -21,10 +21,10 @@ $(document).ready(function(){
     for (var i = 0; i < messageArray.length; i++) {
       if (messageArray[i].xPos == -1 || messageArray[i].yPos == -1) {
         //this one is in the toolbox. No positioning.
-        var newActor = "<div id='" + messageArray[i].id + "' class='actor inToolBox'><div class='dragHandle'>" + messageArray[i].name + "</div><div class='stanceControl forward' id='" + messageArray[i].id + "_0'>F</div><div class='stanceControl balanced' id='" + messageArray[i].id + "_1'>B</div><div class='stanceControl defensive' id='" + messageArray[i].id + "_2'>D</div><div class='stanceControl ranged' id='" + messageArray[i].id + "_3'>R</div></div>";
+        var newActor = createActor(messageArray[i].id, messageArray[i].name);
         $("#actors").append(newActor);
       } else {
-        var newActor = "<div id='" + messageArray[i].id + "' class='actor onMap'><div class='dragHandle'>" + messageArray[i].name + "</div><div class='stanceControl forward' id='" + messageArray[i].id + "_0'>F</div><div class='stanceControl balanced' id='" + messageArray[i].id + "_1'>B</div><div class='stanceControl defensive' id='" + messageArray[i].id + "_2'>D</div><div class='stanceControl ranged' id='" + messageArray[i].id + "_3'>R</div></div>";
+        var newActor = createActor(messageArray[i].id, messageArray[i].name);
         $("#map").append(newActor);
         var posSet = $("#" + messageArray[i].id);
         posSet.css({top: messageArray[i].yPos, left: messageArray[i].xPos});
@@ -42,7 +42,7 @@ $(document).ready(function(){
     var messageBody = JSON.parse(data);
     updateLog("Adding actor " + messageBody.name);
     //Add new actor to the toolbox, then add message to the log.
-    var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
+    var newActor = createActor(messageBody.id, messageBody.name);
     $("#actors").append(newActor);
     $("#" + messageBody.id).data("xPos", messageBody.xPos);
     $("#" + messageBody.id).data("yPos", messageBody.yPos);
@@ -78,7 +78,7 @@ $(document).ready(function(){
         } else {
           // it is presently on the map, must remove it and add it to the toolbox
           activeActor.remove();
-          var newActor = "<div id='" + messageBody.id + "' class='actor inToolBox'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
+          var newActor = createActor(messageBody.id, messageBody.name);
           $("#actors").append(newActor);
           activeActor = $("#" + messageBody.id);
           activeActor.data("xPos", -1);
@@ -94,7 +94,7 @@ $(document).ready(function(){
         if (activeActor.data("xPos") == -1 || activeActor.data("yPos") == -1) {
           // it is presently in the toolbox. Must remove it and add it to the map.
           activeActor.remove();
-          var newActor = "<div id='" + messageBody.id + "' class='actor onMap'><div class='dragHandle'>" + messageBody.name + "</div><div class='stanceControl forward' id='" + messageBody.id + "_0'>F</div><div class='stanceControl balanced' id='" + messageBody.id + "_1'>B</div><div class='stanceControl defensive' id='" + messageBody.id + "_2'>D</div><div class='stanceControl ranged' id='" + messageBody.id + "_3'>R</div></div>";
+          var newActor = createActor(messageBody.id, messageBody.name);
           $("#map").append(newActor);
           activeActor = $("#" + messageBody.id);
           activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
@@ -161,6 +161,10 @@ $(document).ready(function(){
   updateLog("Requesting initial state.");
   socket.emit("initialState", { });
 });
+
+function createActor(id, name) {
+  return "<div id='" + id + "' class='actor onMap'><div class='dragHandle'>" + name + "</div><div class='stanceControl forward' id='" + id + "_0'>F</div><div class='stanceControl balanced' id='" + id + "_1'>B</div><div class='stanceControl defensive' id='" + id + "_2'>D</div><div class='stanceControl ranged' id='" + id + "_3'>R</div></div>";
+}
 
 function stanceChangeHandler(event) {
     var ident = this.id.split("_");
