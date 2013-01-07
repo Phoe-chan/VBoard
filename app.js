@@ -5,7 +5,7 @@ var express = require("express")
   , sio = require("socket.io")
   , check = require("validator").check
   , sanitise = require("validator").sanitize
-  , dbaccess = require("./dbaccess.js");
+  , dbaccess = require("./server/dbaccess.js");
 
 var app = express();
 
@@ -27,10 +27,12 @@ app.configure("development", function(){
 });
 
 app.get("/", routes.index);
+app.get("/board/", routes.index);
 app.get("/board/:boardId", routes.board);
+app.post("/board/:mapName", routes.addboard);
+app.delete("/board/:boardId", routes.deleteboard);
 app.get("/boards/", routes.boardlist);
 
-var namedActors = [];
 var server = http.createServer(app).listen(app.get("port"), function(){
   console.log("Express server listening on port " + app.get("port"));
 });
@@ -48,16 +50,13 @@ io.sockets.on("connection", function (socket) {
     // add new actor
     var clean = sanitise(messageBody.name).xss();
     clean = sanitise(clean).entityEncode();
-    if (namedActors.indexOf(clean) > -1) {
-      socket.emit("error", JSON.stringify({ message: clean + " is already registered with the system. Try another name." }));
-      return;
-    }
     dbaccess.addActor(clean, socket, io);
   });
   socket.on("deleteActor", function (messageBody) {
     // delete actor
     check(messageBody.id).isInt();
     dbaccess.deleteActor(messageBody.id, messageBody.name, socket, io);
+    }
   });
   socket.on("moveActor", function (messageBody) {
     // update repository with new position data
