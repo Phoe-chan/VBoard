@@ -122,7 +122,6 @@ module.exports = {
         console.log(error);
         socket.emit("error", JSON.stringify({ message: "Failed to open database." }));
         return;
-    });
       });
       db.run("UPDATE actors SET stance = $stance WHERE id = $id",
         { $stance:stance, $id:id }, 

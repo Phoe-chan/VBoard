@@ -57,7 +57,6 @@ io.sockets.on("connection", function (socket) {
     // delete actor
     check(messageBody.id).isInt();
     dbaccess.deleteActor(messageBody.id, messageBody.name, socket, io);
-    }
   });
   socket.on("moveActor", function (messageBody) {
     // update repository with new position data
