@@ -32,6 +32,7 @@ app.get("/board/:boardId", routes.board);
 app.post("/board/:mapName", routes.addboard);
 app.delete("/board/:boardId", routes.deleteboard);
 app.get("/boards/", routes.boardlist);
+app.get("/images/", routes.imagelist);
 
 var server = http.createServer(app).listen(app.get("port"), function(){
   console.log("Express server listening on port " + app.get("port"));
