@@ -4,7 +4,9 @@
 var dbaccess = require("../server/dbaccess.js");
 
 exports.index = function(req, res){
-  res.render('index', { title: 'VBoard' });
+  dbaccess.getBoards(function (result) {
+    res.render('index', { title: 'VBoard', boards: result });
+  });
 };
 
 exports.board = function(req, res) {
@@ -13,23 +15,26 @@ exports.board = function(req, res) {
 }
 
 exports.boardlist  = function(req, res){
-  var boardlistJSON = JSON.stringify(dbaccess.getBoards()); 
-  res.writeHead(200, {'content-type': 'text/json' });
-  res.json(boardListJSON);
+  dbaccess.getBoards(function (result) { 
+    res.writeHead(200, {'content-type': 'text/json' });
+    res.json(JSON.stringify(result));
+  });
 };
 
 exports.addboard  = function(req, res){
   var mapName = req.params.mapName;
-  var newBoard = JSON.stringify(dbaccess.addBoard(mapName));
-  res.writeHead(200, {'content-type': 'text/json' });
-  res.json(newBoard);
+  dbaccess.addBoard(mapName, function(result) {
+    res.writeHead(200, {'content-type': 'text/json' });
+    res.json(JSON.stringify(result));
+  });
 };
 
 exports.deleteboard  = function(req, res){
   var boardId = req.params.boardId;
-  var result = JSON.stringify(dbaccess.deleteBoard(boardId));
-  res.writeHead(200, {'content-type': 'text/json' });
-  res.json(result);
+  dbaccess.deleteBoard(boardId, function(result) {
+    res.writeHead(200, {'content-type': 'text/json' });
+    res.json(JSON.stringify(result));
+  });
 };
 
 exports.imagelist  = function(req, res){

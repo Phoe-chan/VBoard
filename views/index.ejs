@@ -10,9 +10,19 @@
       <div id='title' class='titleBar'>
         Virtual Board
       </div>
+      <div class='error'>
+        <% if (boards.vBoardError) { %>
+          <%= boards.vBoardError %>
+        <% } %>
+      </div>
     </div>
     <div id='main' data-role='content'>
-      The mainpage, pick out a board to interact with.
+      <h1>The mainpage, pick out a board to interact with.</h1>
+      <% if (!boards.vBoardError) { %>
+        <% boards.forEach( function(board) { %>
+          <p><a href="/board/<%=board.id %>"><%= board.mapName %></a></p>
+        <% }); %>
+      <% } %>
     </div>  
     <script type='text/javascript' src='/javascripts/jquery-1.8.2.min.js'></script>
     <script type='text/javascript' src='/javascripts/jquery-ui-1.8.24.custom.min.js'></script>

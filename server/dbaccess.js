@@ -96,7 +96,6 @@ module.exports = {
     });
     db.all("SELECT id, name, stance, xPos, yPos FROM actors;", [], function(err, results) {
         if (err) {
-          console.log("Error occurred during select.");
           socket.emit("error", JSON.stringify({ message: "Failed to retrieve actors. Query returned error." + err }));
           return;
         }
@@ -143,78 +142,76 @@ module.exports = {
     }
   },
   
-  getBoards: function() {
-    var result;
+  getBoards: function(callback) {
     var db = new sqlite3.Database("public/vboard.db", "OPEN_READ", function (error) {
       console.log(error);
-      return { error: "failed to open database." };
+      callback({ vBoardError: "failed to open database." });
+      return;
     });
     db.all("SELECT id, mapName FROM boards;", [], function(err, results) {
-        if (err) {
-          console.log("Error occurred during select.");
-          result = {error: "Failed to retrieve boards. Query returned error." +err};
-          return;
+      if (err) {
+        callback ({ vBoardError: "Failed to retrieve boards. Query returned error." +err});
+        return;
+      }
+      if (results) {
+        var boardData = [];
+        for (var i = 0; i < results.length; i++) {
+          boardData.push({ id: results[i].id, mapName: results[i].mapName });
         }
-        if (results) {
-          var boardData = [];
-          for (var i = 0; i < results.length; i++) {
-            boardData.push({ id: results[i].id, mapName: results[i].mapName });
-          }
-          result = boardData;
-        } else {
-          result = { error: "Failed to retrieve boards. No boards were found." };
-        }
-      });
+        callback(boardData);
+      } else {
+        callback({ vBoardError: "Failed to retrieve boards. No boards were found." });
+      }
+    });
     db.close();
-    return result;
   },
 
-  addBoard: function(mapName) {
+  addBoard: function(mapName, callback) {
     if (!mapName) {
-      return {error: "No map name provided, cannot create board." };
+      callback({ vBoardError: "No map name provided, cannot create board." });
+      return;
     }
-    var result;
     var db = new sqlite3.Database("public/vboard.db", "OPEN_READWRITE", function (error) {
       console.log(error);
-      return {error: "Failed to open database." };
+      callback({ vBoardError: "Failed to open database." });
+      return;
     });
 
     db.run("INSERT INTO boards ('mapName') VALUES (?)", [mapName], function(err) {
       if (err) {
-        result = { error: "Failed to determine the identity of the new board. Query returned error." + err }
+        callback({ vBoardError: "Failed to determine the identity of the new board. Query returned error." + err });
         return;
       }
       if (this.lastID) {
-        result = {id: this.lastID, name: mapName };
+        callback({id: this.lastID, name: mapName });
       } else {
-        result = { error: "Failed to add new board." };
+        callback({ vBoardError: "Failed to add new board." });
       }
     });
     db.close();
-    return result;
   },
 
-  deleteBoard: function(id) {
+  deleteBoard: function(id, callback) {
     if (id) {
       var db = new sqlite3.Database("public/vboard.db", "OPEN_READWRITE", function (error) {
         console.log(error);
-        return { error: "Failed to open database." };
+        callback({ vBoardError: "Failed to open database." });
+        return;
       });
       db.run("DELETE FROM boards WHERE id = $id", { $id: id }, function(err) {
         if (err) {
-          result = { error: "Failed to delete board. Query returned error." + err };
+          callback({ vBoardError: "Failed to delete board. Query returned error." + err });
           return;
         }
         if (this.changes == 1) {
-          result = { deleted: true };
+          callback({ deleted: true });
         } else {
-          result = { error: "Failed to delete board. Delete resulted in " + this.changes + " changes." };
+          callback({ vBoardError: "Failed to delete board. Delete resulted in " + this.changes + " changes." });
         }
       });
       db.close();
     } else {
-      result = { error: "Cannot delete board, no id provided." };
+      callback({ vBoardError: "Cannot delete board, no id provided." });
     }
-    return result;
   }
 };
