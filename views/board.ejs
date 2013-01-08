@@ -6,7 +6,8 @@
         <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body data-role='page'>
-    <div style="visible: false;"><%= boardId %></div>
+    <input type="hidden" id="boardId" name="boardId" value="<%= boardDetails.id %>" />
+    <input type="hidden" id="mapName" name="mapName" value="<%= boardDetails.mapName %>" />
     <div class='topBar' data-role='header'>
       <div id='log' class='logWindow'>
       </div>

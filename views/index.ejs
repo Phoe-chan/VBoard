@@ -10,7 +10,7 @@
       <div id='title' class='titleBar'>
         Virtual Board
       </div>
-      <div class='error'>
+      <div class='error' id='error'>
         <% if (boards.vBoardError) { %>
           <%= boards.vBoardError %>
         <% } %>
@@ -20,7 +20,7 @@
       <h1>The mainpage, pick out a board to interact with.</h1>
       <% if (!boards.vBoardError) { %>
         <% boards.forEach( function(board) { %>
-          <p><a href="/board/<%=board.id %>"><%= board.mapName %></a></p>
+          <div class='boardListItem'>Board #<%= board.id %>: <a href="/board/<%=board.id %>"><%= board.mapName %></a><div class="deleteLink ui-icon ui-icon-trash" id="<%= board.id %>_del"></div></div>
         <% }); %>
       <% } %>
     </div>  

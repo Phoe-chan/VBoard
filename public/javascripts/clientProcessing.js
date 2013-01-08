@@ -40,6 +40,10 @@ $(document).ready(function(){
   });
   socket.on("actorAdded", function (data) {
     var messageBody = JSON.parse(data);
+    var boardId = $("input#boardId").val();
+    if(!boardId == messageBody.boardId) {
+      return;
+    }
     updateLog("Adding actor " + messageBody.name);
     //Add new actor to the toolbox, then add message to the log.
     var newActor = createActor(messageBody.id, messageBody.name);
@@ -56,6 +60,10 @@ $(document).ready(function(){
     var messageBody = JSON.parse(data);
     updateLog("Deleting actor " + messageBody.name);
     //locate the actor involved and delete it, then add a message to the log.
+    var deleteActor = $("#" + messageBody.id);
+    if (!deleteActor) {
+      return;
+    }
     $("#" + messageBody.id).hide('explode', {}, 600, function() { 
       $("#" + messageBody.id).remove; 
     });
@@ -112,13 +120,16 @@ $(document).ready(function(){
       activeActor.data("name", messageBody.name);
       activeActor.data("stance", stance);
     } else {
-      // Could not find the actor being moved, raise error.
-      updateLog("Error: Could not find the actor being moved: " + messageBody.name, 1);
+      // Could not find the actor being moved, this is valid if the actor is on another map.
+      //updateLog("Error: Could not find the actor being moved: " + messageBody.name, 1);
     }
   });
   socket.on("stanceChanged", function (data) {
     var messageBody = JSON.parse(data);
     var activeActor = $("#" + messageBody.id);
+    if (!activeActor) {
+      return;
+    }
     updateLog("Actor " + activeActor.data("name") + " changed stance from " + activeActor.data("stance") + " to " + messageBody.stance);
     $("#" + messageBody.id + "_" + activeActor.data("stance")).removeClass("lit");
     $("#" + messageBody.id + "_" + messageBody.stance).addClass("lit");
@@ -155,11 +166,16 @@ $(document).ready(function(){
   $("#addButton").click(function() {
     var newName = $("#actorName").val();
     $("#actorName").val("");
-    socket.emit("newActor", { name: newName });
+    var boardId = $("input#boardId").val();
+    socket.emit("newActor", { name: newName, boardId: boardId });
   });
 
+  var mapImage = $("input#mapName").val();
+  $("#map").css("background-image", "url('/images/" + mapImage + "')");
+
   updateLog("Requesting initial state.");
-  socket.emit("initialState", { });
+  var boardId = $("input#boardId").val();
+  socket.emit("initialState", { boardId : boardId });
 });
 
 function createActor(id, name) {

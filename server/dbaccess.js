@@ -2,20 +2,24 @@ var sqlite3 = require("sqlite3"), //.verbose();
     utils = require("./utils.js");
 
 module.exports = {
-  addActor : function(name, socket, io) {
+  addActor : function(name, boardId, socket, io) {
     if (name) {
+      if (!boardId) {
+        socket.emit("error", JSON.stringify({ message: "No board ID was provided with the actor creation. Cannot proceed." }));
+        return;
+      }
       var db = new sqlite3.Database("public/vboard.db", "OPEN_READWRITE", function (error) {
         console.log(error);
         socket.emit("error", JSON.stringify({ message: "Failed to open database." }));
         return;
       });
-      db.run("INSERT INTO actors ('name', 'stance', 'xPos', 'yPos') VALUES (?, 0, -1, -1)", [name], function(err) {
+      db.run("INSERT INTO actors ('name', 'boardId', 'stance', 'xPos', 'yPos') VALUES (?, ?, 0, -1, -1)", [name, boardId], function(err) {
         if (err) {
           socket.emit("error", JSON.stringify({ message: "Failed to add new actor. Query returned error." + err }));
           return;
         }
         if (this.lastID) {
-          var addedData = {id: this.lastID, name: name, stance: 0, xPos: -1, yPos: -1};
+          var addedData = {id: this.lastID, name: name, boardId: boardId, stance: 0, xPos: -1, yPos: -1};
           io.sockets.emit("actorAdded", JSON.stringify(addedData));
         } else {
           socket.emit("error", JSON.stringify({ message: "Failed to add new actor. Likely a store issue or id collision." }));
@@ -88,13 +92,17 @@ module.exports = {
     }
   },
 
-  getCurrentActorState: function(socket) {
+  getCurrentActorState: function(boardId, socket) {
+    if (!boardId) {
+        socket.emit("error", JSON.stringify({ message: "No boardId provided when asking for Actor State. Cannot process.." }));
+        return;
+    }
     var db = new sqlite3.Database("public/vboard.db", "OPEN_READ", function (error) {
       console.log(error);
       socket.emit("error", JSON.stringify({ message: "Failed to open database." }));
       return;
     });
-    db.all("SELECT id, name, stance, xPos, yPos FROM actors;", [], function(err, results) {
+    db.all("SELECT id, name, stance, xPos, yPos FROM actors WHERE boardId = ?;", [boardId], function(err, results) {
         if (err) {
           socket.emit("error", JSON.stringify({ message: "Failed to retrieve actors. Query returned error." + err }));
           return;
@@ -145,7 +153,7 @@ module.exports = {
   getBoards: function(callback) {
     var db = new sqlite3.Database("public/vboard.db", "OPEN_READ", function (error) {
       console.log(error);
-      callback({ vBoardError: "failed to open database." });
+      callback({ vBoardError: "Failed to open database." });
       return;
     });
     db.all("SELECT id, mapName FROM boards;", [], function(err, results) {
@@ -161,6 +169,33 @@ module.exports = {
         callback(boardData);
       } else {
         callback({ vBoardError: "Failed to retrieve boards. No boards were found." });
+      }
+    });
+    db.close();
+  },
+
+  getBoardProperties: function(boardId, callback, errorCallback) {
+    var db = new sqlite3.Database("public/vboard.db", "OPEN_READ", function (error) {
+      console.log(error);
+      errorCallback({ vBoardError: "Failed to open database." });
+      return;
+    });
+    db.all("SELECT id, mapName FROM boards WHERE id = ?;", [boardId], function(err, results) {
+      if (err) {
+        errorCallback ({ vBoardError: "Failed to retrieve board properties. Query returned error." +err});
+        return;
+      }
+      if (results) {
+        var boardData;
+        if (results.length != 1) {
+          errorCallback({vBoardError: "Did not retrieve a unique board from the database, primary key failure."});
+          return;
+        } else {
+          boardData = ({ id: results[0].id, mapName: results[0].mapName });
+        }
+        callback(boardData);
+      } else {
+        errorCallback({ vBoardError: "Failed to retrieve board. No board with that id was found." });
       }
     });
     db.close();
@@ -204,7 +239,7 @@ module.exports = {
           return;
         }
         if (this.changes == 1) {
-          callback({ deleted: true });
+          callback({ vBoardSuccess: "Deleted board id " + id });
         } else {
           callback({ vBoardError: "Failed to delete board. Delete resulted in " + this.changes + " changes." });
         }

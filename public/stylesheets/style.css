@@ -82,8 +82,8 @@ a {
   position: relative;
   float: left;
   z-Index: 1;
-  background-image: url("/images/trollpool.gif");
   background-repeat: no-repeat;
+  background-position: 5px 37px;
   left: 10px;
 }
 .noscroll {
@@ -122,4 +122,13 @@ a {
 }
 .inToolBox {
   position: static;
+}
+.error {
+  color: #f00;
+}
+.boardListItem {
+  width: 200px;
+}
+.deleteLink {
+  float: right;
 }

@@ -29,7 +29,7 @@ app.configure("development", function(){
 app.get("/", routes.index);
 app.get("/board/", routes.index);
 app.get("/board/:boardId", routes.board);
-app.post("/board/:mapName", routes.addboard);
+app.post("/board/", routes.addboard);
 app.delete("/board/:boardId", routes.deleteboard);
 app.get("/boards/", routes.boardlist);
 app.get("/images/", routes.imagelist);
@@ -43,15 +43,19 @@ io.sockets.on("connection", function (socket) {
   socket.on("error", function (data) {
     console.log(data.message);
   });
-  socket.on("initialState", function (data) {
+  socket.on("initialState", function (messageBody) {
     //client has requested initial update, respond with an "actors" message.
-    dbaccess.getCurrentActorState(socket);
+    var boardId = sanitise(messageBody.boardId).xss();
+    boardId = sanitise(boardId).entityEncode();
+    dbaccess.getCurrentActorState(boardId, socket);
   });
   socket.on("newActor", function (messageBody) {
     // add new actor
     var clean = sanitise(messageBody.name).xss();
     clean = sanitise(clean).entityEncode();
-    dbaccess.addActor(clean, socket, io);
+    var boardId = sanitise(messageBody.boardId).xss();
+    boardId = sanitise(boardId).entityEncode();
+    dbaccess.addActor(clean, boardId, socket, io);
   });
   socket.on("deleteActor", function (messageBody) {
     // delete actor
