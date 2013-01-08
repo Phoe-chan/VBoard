@@ -21,10 +21,10 @@ $(document).ready(function(){
     for (var i = 0; i < messageArray.length; i++) {
       if (messageArray[i].xPos == -1 || messageArray[i].yPos == -1) {
         //this one is in the toolbox. No positioning.
-        var newActor = createActor(messageArray[i].id, messageArray[i].name);
+        var newActor = createActor(messageArray[i].id, messageArray[i].name, "inTollBox");
         $("#actors").append(newActor);
       } else {
-        var newActor = createActor(messageArray[i].id, messageArray[i].name);
+        var newActor = createActor(messageArray[i].id, messageArray[i].name, "onMap");
         $("#map").append(newActor);
         var posSet = $("#" + messageArray[i].id);
         posSet.css({top: messageArray[i].yPos, left: messageArray[i].xPos});
@@ -46,7 +46,7 @@ $(document).ready(function(){
     }
     updateLog("Adding actor " + messageBody.name);
     //Add new actor to the toolbox, then add message to the log.
-    var newActor = createActor(messageBody.id, messageBody.name);
+    var newActor = createActor(messageBody.id, messageBody.name, "inToolBox");
     $("#actors").append(newActor);
     $("#" + messageBody.id).data("xPos", messageBody.xPos);
     $("#" + messageBody.id).data("yPos", messageBody.yPos);
@@ -86,7 +86,7 @@ $(document).ready(function(){
         } else {
           // it is presently on the map, must remove it and add it to the toolbox
           activeActor.remove();
-          var newActor = createActor(messageBody.id, messageBody.name);
+          var newActor = createActor(messageBody.id, messageBody.name, "inToolBox");
           $("#actors").append(newActor);
           activeActor = $("#" + messageBody.id);
           activeActor.data("xPos", -1);
@@ -102,7 +102,7 @@ $(document).ready(function(){
         if (activeActor.data("xPos") == -1 || activeActor.data("yPos") == -1) {
           // it is presently in the toolbox. Must remove it and add it to the map.
           activeActor.remove();
-          var newActor = createActor(messageBody.id, messageBody.name);
+          var newActor = createActor(messageBody.id, messageBody.name, "onMap");
           $("#map").append(newActor);
           activeActor = $("#" + messageBody.id);
           activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
@@ -178,8 +178,8 @@ $(document).ready(function(){
   socket.emit("initialState", { boardId : boardId });
 });
 
-function createActor(id, name) {
-  return "<div id='" + id + "' class='actor onMap'><div class='dragHandle'>" + name + "</div><div class='stanceControl forward' id='" + id + "_0'>F</div><div class='stanceControl balanced' id='" + id + "_1'>B</div><div class='stanceControl defensive' id='" + id + "_2'>D</div><div class='stanceControl ranged' id='" + id + "_3'>R</div></div>";
+function createActor(id, name, positionClass) {
+  return "<div id='" + id + "' class='actor " + positionClass + "'><div class='dragHandle'>" + name + "</div><div class='stanceControl forward' id='" + id + "_0'>F</div><div class='stanceControl balanced' id='" + id + "_1'>B</div><div class='stanceControl defensive' id='" + id + "_2'>D</div><div class='stanceControl ranged' id='" + id + "_3'>R</div></div>";
 }
 
 function stanceChangeHandler(event) {
