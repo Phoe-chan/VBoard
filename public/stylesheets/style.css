@@ -132,3 +132,20 @@ a {
 .deleteLink {
   float: right;
 }
+.mapList {
+  padding: 5px;
+  border: 1px solid #000;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  width: 300px;
+}
+.newMapForm {
+  padding: 5px;
+  border: 1px solid #000;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background: #eeff82;
+  width: 300px;
+}

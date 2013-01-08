@@ -205,6 +205,12 @@ function updateLog(message, type) {
   $("#log").children().filter(':gt(4)').remove();
 }
 
+function setMapWidth() {
+  var pageWidth = $("#main").width();
+  var toolbarWidth = $("#toolBox").width();
+  $("#map").width(pageWidth - toolbarWidth);
+}
+
 //begin copy from JQuery forums on dealing with maximum height, empty divs.
   function stretchScreen () {
     var dheight = $("html").height(); 
