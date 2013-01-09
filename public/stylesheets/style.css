@@ -75,6 +75,7 @@ a {
   min-height: 200px;
   border: 1px solid;
   z-Index: 1;
+  float: left;
 }
 .map {
   width: 80%;
@@ -122,6 +123,7 @@ a {
 }
 .inToolBox {
   position: static;
+  float: left;
 }
 .error {
   color: #f00;

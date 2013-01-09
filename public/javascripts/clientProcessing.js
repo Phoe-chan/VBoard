@@ -21,7 +21,7 @@ $(document).ready(function(){
     for (var i = 0; i < messageArray.length; i++) {
       if (messageArray[i].xPos == -1 || messageArray[i].yPos == -1) {
         //this one is in the toolbox. No positioning.
-        var newActor = createActor(messageArray[i].id, messageArray[i].name, "inTollBox");
+        var newActor = createActor(messageArray[i].id, messageArray[i].name, "inToolBox");
         $("#actors").append(newActor);
       } else {
         var newActor = createActor(messageArray[i].id, messageArray[i].name, "onMap");
