@@ -18,6 +18,7 @@ a {
   background: #eeff82;
   width: 80%;
   float: left;
+  min-height: 80px;
 }
 .timestamp {
   font-size: 10px;
