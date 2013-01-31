@@ -33,10 +33,6 @@ module.exports = {
 
   deleteActor: function(id, name, socket, io) {
     if (id) {
-      var index = namedActors.indexOf(name);
-      if (index > -1) {    
-        namedActors.splice(index, 1);
-      }
       var db = new sqlite3.Database("public/vboard.db", "OPEN_READWRITE", function (error) {
         console.log(error);
         socket.emit("error", JSON.stringify({ message: "Failed to open database." }));
