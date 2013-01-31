@@ -39,8 +39,9 @@ $(document).ready(function(){
   });
   socket.on("actorAdded", function (data) {
     var messageBody = JSON.parse(data);
+
     var boardId = $("input#boardId").val();
-    if(!boardId == messageBody.boardId) {
+    if(boardId != messageBody.boardId) {
       return;
     }
     updateLog("Adding actor " + messageBody.name);
@@ -56,13 +57,18 @@ $(document).ready(function(){
     $("#" + messageBody.id).children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
   });
   socket.on("actorDeleted", function (data) {
-    var messageBody = JSON.parse(data);
-    updateLog("Deleting actor " + messageBody.name);
     //locate the actor involved and delete it, then add a message to the log.
+    var messageBody = JSON.parse(data);
+
+    var boardId = $("input#boardId").val();
+    if(boardId != messageBody.boardId) {
+      return;
+    }
     var deleteActor = $("#" + messageBody.id);
     if (!deleteActor) {
       return;
     }
+    updateLog("Deleting actor " + messageBody.name);
     $("#" + messageBody.id).hide('explode', {}, 600, function() { 
       $("#" + messageBody.id).remove; 
     });
@@ -70,11 +76,16 @@ $(document).ready(function(){
   socket.on("actorMoved", function (data) {
     //locate the actor involved and update it, then add a message to the log.
     var messageBody = JSON.parse(data);
-    updateLog("Updating actor " + messageBody.name);
   
+    var boardId = $("input#boardId").val();
+    if(boardId != messageBody.boardId) {
+      return;
+    }
+
     var activeActor = $("#" + messageBody.id);
     if (activeActor)
     {
+      updateLog("Updating actor " + messageBody.name);
       var stance = activeActor.data("stance");
       var name = activeActor.data("name");
 
@@ -125,6 +136,12 @@ $(document).ready(function(){
   });
   socket.on("stanceChanged", function (data) {
     var messageBody = JSON.parse(data);
+
+    var boardId = $("input#boardId").val();
+    if(boardId != messageBody.boardId) {
+      return;
+    }
+
     var activeActor = $("#" + messageBody.id);
     if (!activeActor) {
       return;
@@ -147,19 +164,22 @@ $(document).ready(function(){
     yOffset = Math.floor(yOffset / 50) * 50;
     var xOffset = dropPos.left - mapPos.left;
     xOffset = Math.floor(xOffset / 50) * 50;
-    socket.emit("moveActor", { id : ui.draggable.attr("id"), name: dragName, xPos: xOffset, yPos: yOffset });
+    var boardId = $("input#boardId").val();
+    socket.emit("moveActor", { id : ui.draggable.attr("id"), name: dragName, boardId: boardId, xPos: xOffset, yPos: yOffset });
   });
   $("#trash").droppable( { greedy: true, accept: ".actor", tolerance: "pointer" } );
   $("#trash").bind("drop", function(event, ui) {
     //emit event for the element's deletion
     var dragName = ui.draggable.data("name");
-    socket.emit("deleteActor", { id : ui.draggable.attr("id"), name: dragName });
+    var boardId = $("input#boardId").val();
+    socket.emit("deleteActor", { id : ui.draggable.attr("id"), boardId: boardId, name: dragName });
   });
   $("#actors").droppable( { greedy: true, accept: ".actor", tolerance: "pointer" } );
   $("#actors").bind("drop", function(event, ui) {
     //emit event moving the element back into the storage tray
     var dragName = ui.draggable.data("name");
-    socket.emit("moveActor", { id: ui.draggable.attr("id"), name: dragName, xPos: -1, yPos: -1 });
+    var boardId = $("input#boardId").val();
+    socket.emit("moveActor", { id: ui.draggable.attr("id"), name: dragName, boardId: boardId, xPos: -1, yPos: -1 });
   });
 
   $("#actorName").watermark("New Actor Name");
@@ -187,7 +207,8 @@ function stanceChangeHandler(event) {
     var actorid = ident[0];
     var stanceid = ident[1];
     var socket = event.data.dispatch;
-    socket.emit("changeStance", { id:actorid, stance:stanceid } );
+    var boardId = $("input#boardId").val();
+    socket.emit("changeStance", { id:actorid, boardId: boardId, stance:stanceid } );
 }
 
 function updateLog(message, type) {

@@ -60,17 +60,20 @@ io.sockets.on("connection", function (socket) {
   socket.on("deleteActor", function (messageBody) {
     // delete actor
     check(messageBody.id).isInt();
-    dbaccess.deleteActor(messageBody.id, messageBody.name, socket, io);
+    check(messageBody.boardId).isInt();
+    dbaccess.deleteActor(messageBody.id, messageBody.name, messageBody.boardId, socket, io);
   });
   socket.on("moveActor", function (messageBody) {
     // update repository with new position data
     check(messageBody.id).isInt();
-    dbaccess.moveActor(messageBody.id, messageBody.name, messageBody.xPos, messageBody.yPos, socket, io);
+    check(messageBody.boardId).isInt();
+    dbaccess.moveActor(messageBody.id, messageBody.name, messageBody.boardId, messageBody.xPos, messageBody.yPos, socket, io);
   });
   socket.on("changeStance", function (messageBody) {
     // update repository with new stance for character
     check(messageBody.id).isInt();
+    check(messageBody.boardId).isInt();
     check(messageBody.stance).isInt();
-    dbaccess.updateStance(messageBody.id, messageBody.stance, socket, io);
+    dbaccess.updateStance(messageBody.id, messageBody.stance, messageBody.boardId, socket, io);
   });
 });

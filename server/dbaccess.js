@@ -31,7 +31,7 @@ module.exports = {
     }
   },
 
-  deleteActor: function(id, name, socket, io) {
+  deleteActor: function(id, name, boardId, socket, io) {
     if (id) {
       var db = new sqlite3.Database("public/vboard.db", "OPEN_READWRITE", function (error) {
         console.log(error);
@@ -44,7 +44,7 @@ module.exports = {
           return;
         }
         if (this.changes == 1) {
-          var deletedData = { id: id, name: name };
+          var deletedData = { id: id, boardId: boardId, name: name };
           io.sockets.emit("actorDeleted", JSON.stringify(deletedData));
         } else {
           socket.emit("error", JSON.stringify({ message: "Failed to delete actor. Delete resulted in " + this.changes + " changes." }));
@@ -56,7 +56,7 @@ module.exports = {
     }
   },
 
-  moveActor: function(id, name, newX, newY, socket, io) {
+  moveActor: function(id, name, boardId, newX, newY, socket, io) {
     if (id) {
       if(!utils.isNumber(newX) || !utils.isNumber(newY)) {
         console.log("moveActor: Position data was not numeric.");
@@ -76,7 +76,7 @@ module.exports = {
             return;
           }
           if (this.changes == 1) {
-            var movedData = { id: id, name: name, xPos: newX, yPos: newY };
+            var movedData = { id: id, name: name, boardId: boardId, xPos: newX, yPos: newY };
             io.sockets.emit("actorMoved", JSON.stringify(movedData));
           } else {
             socket.emit("error", JSON.stringify({ message: "Failed to update actor. Update resulted in " + this.changes + " changes." }));
@@ -116,7 +116,7 @@ module.exports = {
     db.close();
   },
 
-  updateStance: function(id, stance, socket, io) {
+  updateStance: function(id, stance, boardId, socket, io) {
     if (id) {
       if (!utils.isNumber(stance) || (stance < 0 || stance > 3)) {
         stance = 1;
@@ -134,7 +134,7 @@ module.exports = {
             return;
           }
           if (this.changes == 1) {
-            var changedData = {id: id, stance: stance};
+            var changedData = {id: id, boardId: boardId, stance: stance};
             io.sockets.emit("stanceChanged", JSON.stringify(changedData));
           } else {
             socket.emit("error", JSON.stringify({ message: "Failed to update the single actor to their new stance." }));
