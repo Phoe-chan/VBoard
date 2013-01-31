@@ -10,11 +10,11 @@
       <div id='title' class='titleBar'>
         Virtual Board
       </div>
-      <div class='error' id='error'>
-        <% if (boards.vBoardError) { %>
+      <% if (boards.vBoardError) { %>
+        <div class='error' id='error'>
           <%= boards.vBoardError %>
-        <% } %>
-      </div>
+        </div>
+      <% } %>
     </div>
     <div class='mapList' data-role='content'>
       <% if (!boards.vBoardError) { %>
