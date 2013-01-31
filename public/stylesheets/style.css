@@ -95,8 +95,8 @@ a {
 .actor {
   position: relative;
   border: 1px solid #000;
-  height: 50px;
-  width: 50px;
+  height: 48px;
+  width: 48px;
   z-Index: 100;
   overflow: hidden;
 }

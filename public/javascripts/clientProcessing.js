@@ -11,7 +11,6 @@ $(document).ready(function(){
   });
   socket.on('error', function (data) {
     var messageBody = JSON.parse(data);
-    console.log(messageBody);
     updateLog(messageBody.message, 1);
   });
   socket.on("actors", function (data) {
@@ -33,7 +32,7 @@ $(document).ready(function(){
       $("#" + messageArray[i].id).data("yPos", messageArray[i].yPos);
       $("#" + messageArray[i].id).data("name", messageArray[i].name);
       $("#" + messageArray[i].id).data("stance", messageArray[i].stance);
-      $("#" + messageArray[i].id).draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
+      $("#" + messageArray[i].id).draggable({ revert: "invalid", snap: true, cancel: ".stanceControl" });
       $("#" + messageArray[i].id + "_" + messageArray[i].stance).addClass("lit");
       $("#" + messageArray[i].id).children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
     }
@@ -52,7 +51,7 @@ $(document).ready(function(){
     $("#" + messageBody.id).data("yPos", messageBody.yPos);
     $("#" + messageBody.id).data("name", messageBody.name);
     $("#" + messageBody.id).data("stance", messageBody.stance);
-    $("#" + messageBody.id).draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl"  });
+    $("#" + messageBody.id).draggable({ revert: "invalid", snap: true, cancel: ".stanceControl"  });
     $("#" + messageBody.id + "_" + messageBody.stance).addClass("lit");
     $("#" + messageBody.id).children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
   });
@@ -95,7 +94,7 @@ $(document).ready(function(){
           activeActor.data("stance", stance);
           $("#" + messageBody.id + "_" + activeActor.data("stance")).addClass("lit");
           activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
-          activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
+          activeActor.draggable({ revert: "invalid", snap: true, cancel: ".stanceControl" });
         }
       } else {
         // command to move it on the map.
@@ -106,7 +105,7 @@ $(document).ready(function(){
           $("#map").append(newActor);
           activeActor = $("#" + messageBody.id);
           activeActor.children(".stanceControl").click({ dispatch: socket }, stanceChangeHandler);
-          activeActor.draggable({ grid: [50, 50], revert: "invalid", snap: true, cancel: ".stanceControl" });
+          activeActor.draggable({ revert: "invalid", snap: true, cancel: ".stanceControl" });
           $("#" + messageBody.id + "_" + stance).addClass("lit");
         } else {
           // it is presently on the map, we must move it.
@@ -145,8 +144,9 @@ $(document).ready(function(){
     var dropPos = ui.draggable.offset()
     var mapPos = $(this).offset();
     var yOffset = dropPos.top - mapPos.top;
+    yOffset = Math.floor(yOffset / 50) * 50;
     var xOffset = dropPos.left - mapPos.left;
-    console.log("move set to (" + xOffset + "," + yOffset + ")");
+    xOffset = Math.floor(xOffset / 50) * 50;
     socket.emit("moveActor", { id : ui.draggable.attr("id"), name: dragName, xPos: xOffset, yPos: yOffset });
   });
   $("#trash").droppable( { greedy: true, accept: ".actor", tolerance: "pointer" } );
